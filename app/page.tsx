@@ -1,8 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import SwimMap from './components/Map'
+import dynamic from 'next/dynamic'
 import { SwimmerData } from './types/swim'
+
+// Dynamically import the Map component with ssr disabled
+const SwimMap = dynamic(
+  () => import('./components/Map'),
+  { ssr: false } // This ensures the component only loads on client-side
+)
 
 export default function Home() {
   const [selectedSwimmer, setSelectedSwimmer] = useState<SwimmerData | null>(null)
