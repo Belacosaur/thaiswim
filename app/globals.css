@@ -45,3 +45,18 @@ body {
 .custom-popup .leaflet-popup-tip {
   background: rgba(255, 255, 255, 0.9);
 }
+
+.swimmer-info {
+  background: rgba(255, 255, 255, 0.95);
+  border: none !important;
+  min-width: 240px;
+}
+
+.swimmer-info h3 {
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.swimmer-info p {
+  color: #4b5563;
+}

@@ -11,11 +11,36 @@ interface SwimMapProps {
 export default function SwimMap({ onMarkerClick }: SwimMapProps) {
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<L.Map | null>(null)
+  const infoControlRef = useRef<L.Control | null>(null)
+
+  const updateInfoContent = (content: string) => {
+    if (infoControlRef.current) {
+      const container = infoControlRef.current.getContainer()
+      if (container) {
+        container.innerHTML = content
+      }
+    }
+  }
 
   useEffect(() => {
     if (typeof window !== 'undefined' && mapRef.current && !mapInstanceRef.current) {
       const map = L.map(mapRef.current).setView([7.8383, 98.6834], 11)
       mapInstanceRef.current = map
+
+      // Create custom control
+      const InfoControl = L.Control.extend({
+        onAdd: function() {
+          const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control swimmer-info bg-white/90 p-4 rounded-lg shadow-lg w-80')
+          container.innerHTML = `
+            <h3 class="text-gray-800 font-bold mb-2">Phi Phi to Phuket Swim</h3>
+            <p class="text-gray-600">Click a swimmer to see their progress</p>
+          `
+          return container
+        }
+      })
+
+      infoControlRef.current = new InfoControl({ position: 'topright' })
+      infoControlRef.current.addTo(map)
 
       map.on('click', () => {
         onMarkerClick(null) // Clear selection when clicking map
@@ -67,7 +92,27 @@ export default function SwimMap({ onMarkerClick }: SwimMapProps) {
         marker.on('click', (e) => {
           e.originalEvent.stopPropagation()
           onMarkerClick(swimmer)
+          
+          updateInfoContent(`
+            <div class="text-gray-800">
+              <h3 class="font-bold text-lg mb-2">${swimmer.name}</h3>
+              <div class="space-y-2">
+                <p>Distance: ${(swimmer.distanceCovered / 1000).toFixed(1)}km</p>
+                <p>Progress: ${((swimmer.distanceCovered / mockRoute.distance) * 100).toFixed(1)}%</p>
+                <p class="text-sm">Last Update: ${swimmer.lastUpdate.toLocaleTimeString()}</p>
+              </div>
+            </div>
+          `)
         })
+      })
+
+      // Reset info control on map click
+      map.on('click', () => {
+        onMarkerClick(null)
+        updateInfoContent(`
+          <h3 class="text-gray-800 font-bold mb-2">Phi Phi to Phuket Swim</h3>
+          <p class="text-gray-600">Click a swimmer to see their progress</p>
+        `)
       })
     }
 
