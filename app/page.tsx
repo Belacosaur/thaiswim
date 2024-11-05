@@ -14,6 +14,11 @@ export default function Home() {
         <div className="h-[80vh] rounded-lg overflow-hidden shadow-lg bg-white">
           <SwimMap onMarkerClick={setSelectedSwimmer} />
         </div>
+        {selectedSwimmer && (
+          <div>
+            Selected swimmer: {selectedSwimmer.name}
+          </div>
+        )}
       </div>
     </main>
   )
